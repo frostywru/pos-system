@@ -1,100 +1,69 @@
 body {
   font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  text-align: center;
 }
 
-h2 {
-  text-align: center;
-  margin-top: 20px;
+#login-screen, #pos-screen {
+  padding: 20px;
 }
 
 #selection-screen {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-gap: 15px;
-  padding: 20px;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.category-box {
-  background-color: white;
+.grid-item {
+  background-color: #ffffff;
   border: 2px solid #ccc;
-  border-radius: 8px;
-  padding: 15px;
-  text-align: center;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.category-box:hover {
-  background-color: #eaeaea;
-  transform: scale(1.03);
-}
-
-/* Color Variants for Cigarette Types */
-.variant-red {
-  background-color: #ffcccc;
-}
-
-.variant-blue {
-  background-color: #cce5ff;
-}
-
-.variant-black {
-  background-color: #d9d9d9;
-}
-
-.variant-green {
-  background-color: #d0f0c0;
-}
-
-.variant-yellow {
-  background-color: #fff9c4;
-}
-
-/* Quantity Input */
-#quantity-input {
-  width: 100%;
-  font-size: 1.5em;
   padding: 10px;
-  margin: 15px 0;
-  box-sizing: border-box;
-}
-
-/* Add to Cart Button */
-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 15px;
-  font-size: 1.2em;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  width: 100%;
+  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  transition: transform 0.1s;
 }
 
-button:hover {
-  background-color: #45a049;
+.grid-item img {
+  max-width: 60px;
+  max-height: 60px;
+  margin-bottom: 5px;
 }
 
-/* Cart Section */
+.grid-item:hover {
+  transform: scale(1.05);
+  background-color: #f5f5f5;
+}
+
+#quantity-screen {
+  margin-top: 20px;
+}
+
 #cart {
+  margin-top: 30px;
   padding: 15px;
   background-color: #fff;
   border-top: 2px solid #ccc;
-  font-size: 1.1em;
 }
 
-/* Responsive (Optional) */
-@media (max-width: 768px) {
-  #selection-screen {
-    grid-template-columns: repeat(2, 1fr);
-  }
+#change-cashier {
+  background-color: #ff5050;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-  button {
-    font-size: 1em;
-  }
+#change-cashier:hover {
+  background-color: #e60000;
 }

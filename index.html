@@ -3,26 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>POS - Cashier</title>
+  <title>Sari-Sari Store POS</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- LOGIN SCREEN -->
   <div id="login-screen">
-    <h2>Enter PIN to Login</h2>
-    <input type="number" id="pin-input" maxlength="4" placeholder="Enter PIN" inputmode="numeric" pattern="\d*"/>
+    <h2>Enter Cashier PIN</h2>
+    <input type="password" id="pin-input" placeholder="Enter PIN" />
     <button onclick="handleLogin()">Login</button>
   </div>
 
+  <!-- POS SCREEN -->
   <div id="pos-screen" style="display: none;">
-    <div class="top-bar">
-      <span>Cashier: <strong id="cashier-name"></strong></span>
-      <button class="change-btn" onclick="changeCashier()">Change Cashier</button>
+    <div id="header">
+      <span id="cashier-name"></span>
+      <button id="change-cashier" onclick="changeCashier()">Change Cashier</button>
     </div>
-    <div id="categories-container">
-      <!-- Categories / Brands / Items will appear here -->
+
+    <!-- CATEGORY/BRAND/ITEM DISPLAY -->
+    <div id="selection-screen" class="grid-container"></div>
+
+    <!-- QUANTITY INPUT SCREEN -->
+    <div id="quantity-screen" style="display: none;">
+      <h2 id="selected-item-name"></h2>
+      <input type="number" id="quantity-input" min="1" value="1" />
+      <button id="add-to-cart">Add to Cart</button>
+    </div>
+
+    <!-- CART DISPLAY -->
+    <div id="cart">
+      <h3>Cart</h3>
     </div>
   </div>
 
+  <!-- Firebase Config -->
+  <script type="module" src="firebase.js"></script>
   <script type="module" src="script.js"></script>
 </body>
 </html>

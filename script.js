@@ -1,99 +1,131 @@
-let cashier = JSON.parse(localStorage.getItem("currentCashier"));
-document.getElementById("cashier-name").innerText = cashier.name;
+import { db, ref, get, child } from './firebase.js';
 
-let currentView = "categories";
-let currentCategory = "";
-let currentBrand = "";
-let currentItem = null;
+let cashierList = {};
+let data = {};
+let currentCashier = null;
+let cart = [];
 
-fetch('items.json')
-  .then(res => res.json())
-  .then(data => {
-    setupCategories(data);
-  });
-
-function setupCategories(data) {
-  const screen = document.getElementById("selection-screen");
-  screen.innerHTML = "<h2>Select Category</h2>";
-  currentView = "categories";
-
-  const categories = Object.keys(data);
-  categories.forEach(cat => {
-    const div = document.createElement("div");
-    div.className = "category-box";
-    div.innerHTML = `<img src="images/${cat.toLowerCase()}.png" style="max-width: 100%; height: 50px;"><br>${cat}`;
-    div.onclick = () => showBrands(cat, data[cat]);
-    screen.appendChild(div);
-  });
+async function loadCashiers() {
+  const snapshot = await get(child(ref(db), 'cashiers'));
+  if (snapshot.exists()) {
+    cashierList = snapshot.val();
+  } else {
+    alert("No cashiers found.");
+  }
 }
 
-function showBrands(category, brands) {
-  const screen = document.getElementById("selection-screen");
-  screen.innerHTML = `<h2>${category} - Select Brand</h2>`;
-  currentView = "brands";
-  currentCategory = category;
-
-  Object.keys(brands).forEach(brand => {
-    const div = document.createElement("div");
-    div.className = "category-box";
-    div.innerHTML = `<img src="images/${brand.toLowerCase()}.png" style="max-width: 100%; height: 50px;"><br>${brand}`;
-    div.onclick = () => showItems(brand, brands[brand]);
-    screen.appendChild(div);
-  });
+function handleLogin() {
+  const pin = document.getElementById("pin-input").value;
+  const found = Object.values(cashierList).find(c => c.pin === pin);
+  if (found) {
+    localStorage.setItem("currentCashier", JSON.stringify(found));
+    showPOS(found);
+  } else {
+    alert("Invalid PIN");
+  }
 }
 
-function showItems(brand, items) {
-  const screen = document.getElementById("selection-screen");
-  screen.innerHTML = `<h2>${brand} - Select Item</h2>`;
-  currentView = "items";
-  currentBrand = brand;
-
-  items.forEach(item => {
-    const div = document.createElement("div");
-    const colorClass = getColorClass(item.name);
-    div.className = `category-box ${colorClass}`;
-    div.innerHTML = `<strong>${item.name}</strong><br>₱${item.price} ${item.unit}`;
-    div.onclick = () => showQuantityInput(item);
-    screen.appendChild(div);
-  });
+function showPOS(cashier) {
+  currentCashier = cashier;
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("pos-screen").style.display = "block";
+  document.getElementById("cashier-name").innerText = `Cashier: ${cashier.name}`;
+  loadItemData();
 }
 
-function showQuantityInput(item) {
-  currentItem = item;
-  const screen = document.getElementById("selection-screen");
-  screen.innerHTML = `
-    <h2>Enter Quantity</h2>
-    <div class="category-box">
-      <strong>${item.name}</strong><br>₱${item.price} ${item.unit}
-    </div>
-    <input id="quantity-input" type="number" min="1" placeholder="Quantity" style="width: 100%; font-size: 1.5em; padding: 10px; margin: 10px 0;">
-    <button onclick="addToCart()" style="width: 100%; font-size: 1.5em;">Add to Cart</button>
-  `;
+function changeCashier() {
+  localStorage.removeItem("currentCashier");
+  location.reload();
+}
+
+async function loadItemData() {
+  const res = await fetch("data.json");
+  data = await res.json();
+  showCategories();
+}
+
+function showCategories() {
+  const container = document.getElementById("selection-screen");
+  container.innerHTML = "";
+  for (const [category, brands] of Object.entries(data)) {
+    const div = document.createElement("div");
+    div.className = "grid-item";
+    div.innerHTML = `<img src="images/${category}.png" /><span>${category}</span>`;
+    div.onclick = () => showBrands(category);
+    container.appendChild(div);
+  }
+}
+
+function showBrands(category) {
+  const container = document.getElementById("selection-screen");
+  container.innerHTML = "";
+  for (const [brand, items] of Object.entries(data[category])) {
+    const div = document.createElement("div");
+    div.className = "grid-item";
+    div.innerHTML = `<img src="images/${brand}.png" /><span>${brand}</span>`;
+    div.onclick = () => showItems(category, brand);
+    container.appendChild(div);
+  }
+}
+
+function showItems(category, brand) {
+  const container = document.getElementById("selection-screen");
+  container.innerHTML = "";
+  for (const [variant, item] of Object.entries(data[category][brand])) {
+    const div = document.createElement("div");
+    div.className = "grid-item";
+    div.style.backgroundColor = item.color || "#ddd";
+    div.innerHTML = `<span>${variant}<br>₱${item.price}</span>`;
+    div.onclick = () => promptQuantity(category, brand, variant, item);
+    container.appendChild(div);
+  }
+}
+
+function promptQuantity(category, brand, variant, item) {
+  document.getElementById("selection-screen").style.display = "none";
+  document.getElementById("quantity-screen").style.display = "block";
+  document.getElementById("selected-item-name").innerText = `${brand} ${variant}`;
+  document.getElementById("quantity-input").value = 1;
+
+  document.getElementById("add-to-cart").onclick = () => {
+    const qty = parseInt(document.getElementById("quantity-input").value);
+    cart.push({ category, brand, variant, price: item.price, qty });
+    updateCart();
+    document.getElementById("quantity-screen").style.display = "none";
+    document.getElementById("selection-screen").style.display = "grid";
+  };
 }
 
 function addToCart() {
   const qty = parseInt(document.getElementById("quantity-input").value);
-  if (!qty || qty < 1) {
-    alert("Enter valid quantity");
-    return;
+  const item = JSON.parse(document.getElementById("quantity-screen").dataset.item);
+  cart.push({ ...item, qty });
+  updateCart();
+  document.getElementById("quantity-screen").style.display = "none";
+  document.getElementById("selection-screen").style.display = "grid";
+}
+
+function updateCart() {
+  const cartDiv = document.getElementById("cart");
+  cartDiv.innerHTML = `<h3>Cart</h3>`;
+  let total = 0;
+  for (const item of cart) {
+    const subtotal = item.price * item.qty;
+    total += subtotal;
+    const div = document.createElement("div");
+    div.textContent = `${item.brand} ${item.variant} x${item.qty} - ₱${subtotal}`;
+    cartDiv.appendChild(div);
   }
-
-  const cart = document.getElementById("cart");
-  const item = currentItem;
-  const line = document.createElement("div");
-  line.innerText = `${item.name} x${qty} = ₱${item.price * qty}`;
-  cart.appendChild(line);
-
-  // Reset view
-  showItems(currentBrand, JSON.parse(localStorage.getItem("itemData"))[currentCategory][currentBrand]);
+  cartDiv.innerHTML += `<hr><strong>Total: ₱${total}</strong>`;
 }
 
-function getColorClass(name) {
-  name = name.toLowerCase();
-  if (name.includes("red")) return "variant-red";
-  if (name.includes("blue")) return "variant-blue";
-  if (name.includes("black")) return "variant-black";
-  if (name.includes("green")) return "variant-green";
-  if (name.includes("burst") || name.includes("yellow")) return "variant-yellow";
-  return "";
-}
+window.onload = async () => {
+  await loadCashiers();
+  const saved = localStorage.getItem("currentCashier");
+  if (saved) {
+    showPOS(JSON.parse(saved));
+  }
+};
+
+window.handleLogin = handleLogin;
+window.changeCashier = changeCashier;
