@@ -6,24 +6,35 @@ let currentCashier = null;
 let cart = [];
 
 async function loadCashiers() {
-  const snapshot = await get(child(ref(db), 'cashiers'));
-  if (snapshot.exists()) {
-    cashierList = snapshot.val();
-  } else {
-    alert("No cashiers found.");
+  try {
+    const snapshot = await get(child(ref(db), 'cashiers'));
+    if (snapshot.exists()) {
+      cashierList = snapshot.val();
+      console.log("Cashiers loaded:", cashierList);  // for debugging
+    } else {
+      alert("No cashiers found.");
+    }
+  } catch (error) {
+    console.error("Error loading cashiers:", error);
+    alert("Failed to load cashiers.");
   }
 }
+
 
 function handleLogin() {
   const pin = document.getElementById("pin-input").value;
   const found = Object.values(cashierList).find(c => c.pin === pin);
+
   if (found) {
-    localStorage.setItem("currentCashier", JSON.stringify(found));
-    showPOS(found);
+    localStorage.setItem("cashier", JSON.stringify(found));
+    showPOS();
   } else {
     alert("Invalid PIN");
+    console.log("Entered PIN:", pin);
+    console.log("Available cashiers:", cashierList);
   }
 }
+
 
 function showPOS(cashier) {
   currentCashier = cashier;
@@ -38,6 +49,7 @@ function changeCashier() {
   cashier = null;
   document.getElementById('pos-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
+  loadCashiers(); // 🟢 reload cashiers again
 }
 
 
