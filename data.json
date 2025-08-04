@@ -1,124 +1,156 @@
 {
-  "Cigarettes": {
-    "image": "images/cigarette.png",
-    "brands": {
-      "Marlboro": {
-        "image": "images/marlboro.png",
-        "items": {
-          "Red": {
-            "price": 10,
-            "unit": "stick",
-            "color": "red"
-          },
-          "Lights": {
-            "price": 10,
-            "unit": "stick",
-            "color": "lightgray"
-          },
-          "Blue": {
-            "price": 10,
-            "unit": "stick",
-            "color": "blue"
-          },
-          "Black": {
-            "price": 10,
-            "unit": "stick",
-            "color": "black"
-          },
-          "Pack": {
-            "price": 190,
-            "unit": "pack",
-            "color": "maroon"
+  "cashiers": {
+    "cashier01": {
+      "name": "Ate Mich",
+      "pin": "7602"
+    },
+    "cashier02": {
+      "name": "Matt",
+      "pin": "6203"
+    }
+  },
+  "products": {
+    "Cigarettes": {
+      "image": "images/cigarette.png",
+      "brands": {
+        "Marlboro": {
+          "image": "images/marlboro.png",
+          "items": {
+            "Red": {
+              "price": 10,
+              "unit": "stick",
+              "color": "red"
+            },
+            "Lights": {
+              "price": 10,
+              "unit": "stick",
+              "color": "lightgray"
+            },
+            "Blue": {
+              "price": 10,
+              "unit": "stick",
+              "color": "blue"
+            },
+            "Black": {
+              "price": 10,
+              "unit": "stick",
+              "color": "black"
+            },
+            "Pack": {
+              "price": 190,
+              "unit": "pack",
+              "color": "maroon"
+            }
           }
-        }
-      },
-      "Winston": {
-        "image": "images/winston.png",
-        "items": {
-          "Red": {
-            "price": 9,
-            "unit": "stick",
-            "color": "red"
-          },
-          "Lights": {
-            "price": 9,
-            "unit": "stick",
-            "color": "lightgray"
-          },
-          "Mint Burst": {
-            "price": 180,
-            "unit": "pack",
-            "color": "green"
-          },
-          "Pack": {
-            "price": 180,
-            "unit": "pack",
-            "color": "darkred"
+        },
+        "Winston": {
+          "image": "images/winston.png",
+          "items": {
+            "Red": {
+              "price": 9,
+              "unit": "stick",
+              "color": "red"
+            },
+            "Lights": {
+              "price": 9,
+              "unit": "stick",
+              "color": "lightgray"
+            },
+            "Mint Burst": {
+              "price": 180,
+              "unit": "pack",
+              "color": "green"
+            },
+            "Pack": {
+              "price": 180,
+              "unit": "pack",
+              "color": "darkred"
+            }
           }
-        }
-      },
-      "Mighty": {
-        "image": "images/mighty.png",
-        "items": {
-          "Green": {
-            "price": 8,
-            "unit": "stick",
-            "color": "green"
-          },
-          "Red": {
-            "price": 8,
-            "unit": "stick",
-            "color": "red"
-          },
-          "Black": {
-            "price": 8,
-            "unit": "stick",
-            "color": "black"
+        },
+        "Mighty": {
+          "image": "images/mighty.png",
+          "items": {
+            "Green": {
+              "price": 8,
+              "unit": "stick",
+              "color": "green"
+            },
+            "Red": {
+              "price": 8,
+              "unit": "stick",
+              "color": "red"
+            },
+            "Black": {
+              "price": 8,
+              "unit": "stick",
+              "color": "black"
+            },
+            "Pack": {
+              "price": 160,
+              "unit": "pack",
+              "color": "maroon"
+            }
           }
-        }
-      },
-      "Fortune": {
-        "image": "images/fortune.png",
-        "items": {
-          "Green": {
-            "price": 8,
-            "unit": "stick",
-            "color": "green"
+        },
+        "Fortune": {
+          "image": "images/fortune.png",
+          "items": {
+            "Green": {
+              "price": 8,
+              "unit": "stick",
+              "color": "green"
+            },
+            "Pack": {
+              "price": 160,
+              "unit": "pack",
+              "color": "maroon"
+            }
           }
-        }
-      },
-      "Chester": {
-        "image": "images/chester.png",
-        "items": {
-          "Red": {
-            "price": 7,
-            "unit": "stick",
-            "color": "red"
-          },
-          "Black": {
-            "price": 7,
-            "unit": "stick",
-            "color": "black"
-          },
-          "Green": {
-            "price": 7,
-            "unit": "stick",
-            "color": "green"
+        },
+        "Chester": {
+          "image": "images/chester.png",
+          "items": {
+            "Red": {
+              "price": 7,
+              "unit": "stick",
+              "color": "red"
+            },
+            "Black": {
+              "price": 7,
+              "unit": "stick",
+              "color": "black"
+            },
+            "Green": {
+              "price": 7,
+              "unit": "stick",
+              "color": "green"
+            },
+            "Pack": {
+              "price": 140,
+              "unit": "pack",
+              "color": "maroon"
+            }
           }
-        }
-      },
-      "Camel": {
-        "image": "images/camel.png",
-        "items": {
-          "Red": {
-            "price": 7,
-            "unit": "stick",
-            "color": "red"
-          },
-          "Lights": {
-            "price": 7,
-            "unit": "stick",
-            "color": "lightgray"
+        },
+        "Camel": {
+          "image": "images/camel.png",
+          "items": {
+            "Red": {
+              "price": 7,
+              "unit": "stick",
+              "color": "red"
+            },
+            "Lights": {
+              "price": 7,
+              "unit": "stick",
+              "color": "lightgray"
+            },
+            "Pack": {
+              "price": 140,
+              "unit": "pack",
+              "color": "maroon"
+            }
           }
         }
       }
