@@ -34,9 +34,12 @@ function showPOS(cashier) {
 }
 
 function changeCashier() {
-  localStorage.removeItem("currentCashier");
-  location.reload();
+  localStorage.removeItem('cashier');
+  cashier = null;
+  document.getElementById('pos-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
 }
+
 
 async function loadItemData() {
   const res = await fetch("data.json");
