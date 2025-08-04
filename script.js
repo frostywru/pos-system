@@ -1,46 +1,52 @@
-import { db, ref, get, child } from './firebase.js';
+let data;
 
-let cashierList = {};
+fetch('cigarette-categories.json')
+  .then(res => res.json())
+  .then(json => {
+    data = json.categories;
+    showCategories();
+  });
 
-async function loadCashiers() {
-  const snapshot = await get(child(ref(db), 'cashiers'));
-  if (snapshot.exists()) {
-    cashierList = snapshot.val();
-  } else {
-    console.error("No cashiers found in database.");
+function showCategories() {
+  const categoriesDiv = document.getElementById("categories");
+  categoriesDiv.innerHTML = "";
+  for (const categoryName in data) {
+    const btn = document.createElement("button");
+    btn.innerText = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+    btn.onclick = () => showBrands(data[categoryName]);
+    categoriesDiv.appendChild(btn);
   }
 }
 
-function showPOS(cashier) {
-  document.getElementById("login-screen").style.display = "none";
-  document.getElementById("pos-screen").style.display = "block";
-  document.getElementById("cashier-name").innerText = cashier.name;
-}
+function showBrands(categoryData) {
+  document.getElementById("category-screen").style.display = "none";
+  document.getElementById("brand-screen").style.display = "block";
 
-function handleLogin() {
-  const pin = document.getElementById("pin-input").value;
-  if (cashierList[pin]) {
-    const cashier = cashierList[pin];
-    localStorage.setItem("currentCashier", JSON.stringify(cashier));
-    showPOS(cashier);
-  } else {
-    alert("Invalid PIN");
+  const brandsDiv = document.getElementById("brands");
+  brandsDiv.innerHTML = "";
+
+  for (const brand in categoryData) {
+    if (brand.startsWith("_")) continue;
+    const btn = document.createElement("button");
+    btn.innerText = brand;
+    btn.onclick = () => showVariants(categoryData[brand]);
+    brandsDiv.appendChild(btn);
   }
 }
 
-function changeCashier() {
-  localStorage.removeItem("currentCashier");
-  location.reload();
-}
+function showVariants(brandData) {
+  document.getElementById("brand-screen").style.display = "none";
+  document.getElementById("variant-screen").style.display = "block";
 
-window.onload = async () => {
-  await loadCashiers();
-  const saved = localStorage.getItem("currentCashier");
-  if (saved) {
-    const cashier = JSON.parse(saved);
-    showPOS(cashier);
+  const variantsDiv = document.getElementById("variants");
+  variantsDiv.innerHTML = "";
+
+  for (const variant in brandData) {
+    if (variant.startsWith("_")) continue;
+    const info = brandData[variant];
+    const btn = document.createElement("button");
+    btn.innerText = `${variant} - ₱${info.price}/${info.unit}`;
+    btn.onclick = () => alert(`Added: ${variant} (${info.unit}) - ₱${info.price}`);
+    variantsDiv.appendChild(btn);
   }
-};
-
-window.handleLogin = handleLogin;
-window.changeCashier = changeCashier;
+}
