@@ -1,38 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
   <title>POS System</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- LOGIN SCREEN -->
-  <div id="login-screen" style="display: flex; height: 100vh; justify-content: center; align-items: center; background: #f2f2f2; flex-direction: column;">
-    <h2 style="margin-bottom: 20px;">Enter Cashier PIN</h2>
-    <input id="pin-input" type="password" placeholder="PIN" style="padding: 10px 15px; font-size: 1.2em; margin-bottom: 10px; width: 200px; text-align: center;" />
-    <button onclick="handleLogin()" style="padding: 10px 20px; font-size: 1.1em; cursor: pointer;">Login</button>
+  <div id="login-section">
+    <h2>Login</h2>
+    <input
+      id="pin-input"
+      type="password"
+      placeholder="Enter PIN"
+    />
+    <button onclick="login()">Login</button>
+    <p id="login-error" class="error"></p>
   </div>
 
-  <!-- POS SCREEN -->
-  <div id="pos-screen" style="display: none; padding: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h1 id="cashier-name">Cashier: </h1>
-      <button onclick="changeCashier()" style="padding: 8px 16px;">Change Cashier</button>
-    </div>
-
-    <div id="selection-screen" class="grid-container"></div>
-
-    <div id="quantity-screen" style="display: none; margin-top: 20px;">
-      <h2 id="selected-item-name"></h2>
-      <input type="number" id="quantity-input" min="1" value="1" />
-      <button id="add-to-cart">Add to Cart</button>
-    </div>
-
-    <div id="cart" style="margin-top: 20px;">
-      <h3>Cart</h3>
-    </div>
+  <div id="pos-section" style="display:none;">
+    <button onclick="goBack()" id="backBtn" style="display:none;">
+      ⬅ Back
+    </button>
+    <h1 id="section-title">Select Category</h1>
+    <div id="grid" class="grid"></div>
   </div>
 
+  <!-- Load your script as an ES module -->
   <script type="module" src="script.js"></script>
 </body>
 </html>

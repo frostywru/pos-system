@@ -1,154 +1,194 @@
-import { db, ref, get, child } from './firebase.js';
+// script.js
+import {
+  db,
+  ref,
+  get,
+  child,
+  update,
+  push,
+  runTransaction
+} from "./firebase.js";
 
-let cashierList = {};
-let data = {};
+// UI Elements
+const grid = document.getElementById("grid");
+const title = document.getElementById("section-title");
+const backBtn = document.getElementById("backBtn");
+const posSection = document.getElementById("pos-section");
+const loginSection = document.getElementById("login-section");
+const loginError = document.getElementById("login-error");
+
+let currentPath = [];
 let currentCashier = null;
 let cart = [];
-let navigationStack = [];
 
-async function loadCashiers() {
+// 1. LOGIN
+window.login = async function () {
+  const pin = document.getElementById("pin-input").value.trim();
+  loginError.textContent = "";
   try {
-    const snapshot = await get(child(ref(db), 'cashiers'));
-    if (snapshot.exists()) {
-      cashierList = snapshot.val();
-    } else {
-      alert("No cashiers found.");
-    }
-  } catch (error) {
-    alert("Failed to load cashiers.");
-  }
-}
-
-function handleLogin() {
-  const pin = document.getElementById("pin-input").value;
-  const found = Object.values(cashierList).find(c => c.pin === pin);
-
-  if (found) {
-    localStorage.setItem("cashier", JSON.stringify(found));
-    showPOS(found);
-  } else {
-    alert("Invalid PIN");
-  }
-}
-
-function showPOS(cashier) {
-  currentCashier = cashier;
-  document.getElementById("login-screen").style.display = "none";
-  document.getElementById("pos-screen").style.display = "block";
-  document.getElementById("cashier-name").innerText = `Cashier: ${cashier.name}`;
-  loadItemData();
-}
-
-function changeCashier() {
-  localStorage.removeItem('cashier');
-  currentCashier = null;
-  document.getElementById('pos-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  loadCashiers();
-}
-
-async function loadItemData() {
-  const res = await fetch("data.json");
-  data = await res.json();
-  showCategories();
-}
-
-function showCategories() {
-  navigationStack = [];
-  const container = document.getElementById("selection-screen");
-  container.innerHTML = "";
-  for (const [category, brands] of Object.entries(data)) {
-    const div = document.createElement("div");
-    div.className = "grid-item";
-    div.innerHTML = `<img src="images/${category}.png" /><span>${category}</span>`;
-    div.onclick = () => {
-      if (category === "Cigarettes") {
-        navigationStack.push(showCategories);
-        showBrands(category);
+    const snap = await get(ref(db, "cashiers"));
+    const cashiers = snap.val() || {};
+    for (const key in cashiers) {
+      if (cashiers[key].pin === pin) {
+        currentCashier = cashiers[key].name;
+        loginSection.style.display = "none";
+        posSection.style.display = "block";
+        loadCategories();
+        return;
       }
-    };
-    container.appendChild(div);
-  }
-}
-
-function showBrands(category) {
-  const container = document.getElementById("selection-screen");
-  container.innerHTML = `<button onclick="goBack()">← Back</button>`;
-  for (const [brand, items] of Object.entries(data[category])) {
-    const div = document.createElement("div");
-    div.className = "grid-item";
-    div.innerHTML = `<img src="images/${brand}.png" /><span>${brand}</span>`;
-    div.onclick = () => {
-      navigationStack.push(() => showBrands(category));
-      showItems(category, brand);
-    };
-    container.appendChild(div);
-  }
-}
-
-function showItems(category, brand) {
-  const container = document.getElementById("selection-screen");
-  container.innerHTML = `<button onclick="goBack()">← Back</button>`;
-  for (const [variant, item] of Object.entries(data[category][brand])) {
-    const div = document.createElement("div");
-    div.className = "grid-item";
-    div.style.backgroundColor = item.color || "#ddd";
-    div.innerHTML = `<span>${variant}<br>₱${item.price}</span>`;
-    div.onclick = () => {
-      navigationStack.push(() => showItems(category, brand));
-      promptQuantity(category, brand, variant, item);
-    };
-    container.appendChild(div);
-  }
-}
-
-function promptQuantity(category, brand, variant, item) {
-  document.getElementById("selection-screen").style.display = "none";
-  document.getElementById("quantity-screen").style.display = "block";
-  document.getElementById("selected-item-name").innerText = `${brand} ${variant}`;
-  document.getElementById("quantity-input").value = 1;
-
-  document.getElementById("add-to-cart").onclick = () => {
-    const qty = parseInt(document.getElementById("quantity-input").value);
-    cart.push({ category, brand, variant, price: item.price, qty });
-    updateCart();
-    document.getElementById("quantity-screen").style.display = "none";
-    document.getElementById("selection-screen").style.display = "grid";
-    goBack(); // back to item selection
-  };
-}
-
-function updateCart() {
-  const cartDiv = document.getElementById("cart");
-  cartDiv.innerHTML = `<h3>Cart</h3>`;
-  let total = 0;
-  for (const item of cart) {
-    const subtotal = item.price * item.qty;
-    total += subtotal;
-    const div = document.createElement("div");
-    div.textContent = `${item.brand} ${item.variant} x${item.qty} - ₱${subtotal}`;
-    cartDiv.appendChild(div);
-  }
-  cartDiv.innerHTML += `<hr><strong>Total: ₱${total}</strong>`;
-}
-
-function goBack() {
-  if (navigationStack.length > 0) {
-    const previous = navigationStack.pop();
-    previous();
-  }
-}
-
-window.onload = async () => {
-  await loadCashiers();
-  const saved = localStorage.getItem("cashier");
-  if (saved) {
-    showPOS(JSON.parse(saved));
-  } else {
-    document.getElementById("login-screen").style.display = "flex";
+    }
+    loginError.textContent = "Invalid PIN";
+  } catch (err) {
+    loginError.textContent = "Network error, try again.";
   }
 };
 
-window.handleLogin = handleLogin;
-window.changeCashier = changeCashier;
-window.goBack = goBack;
+// 2. NAVIGATION
+async function loadCategories() {
+  currentPath = [];
+  title.textContent = "Select Category";
+  backBtn.style.display = "none";
+  const snap = await get(ref(db, "products"));
+  renderGrid(snap.val(), (cat) => loadBrands(cat));
+}
+
+async function loadBrands(category) {
+  currentPath = [category];
+  title.textContent = category;
+  backBtn.style.display = "inline-block";
+  const snap = await get(
+    child(ref(db), `products/${category}/brands`)
+  );
+  renderGrid(snap.val(), (brand) =>
+    loadItems(category, brand)
+  );
+}
+
+async function loadItems(category, brand) {
+  currentPath = [category, brand];
+  title.textContent = brand;
+  backBtn.style.display = "inline-block";
+  const snap = await get(
+    child(
+      ref(db),
+      `products/${category}/brands/${brand}/items`
+    )
+  );
+  renderGrid(snap.val(), (itemName) =>
+    promptQuantity(category, brand, itemName)
+  );
+}
+
+window.goBack = function () {
+  if (currentPath.length === 2)
+    loadBrands(currentPath[0]);
+  else if (currentPath.length === 1)
+    loadCategories();
+};
+
+// 3. GRID RENDERER
+function renderGrid(obj, onClickFactory) {
+  grid.innerHTML = "";
+  for (const key in obj) {
+    const value = obj[key];
+    const img = value.image || null;
+    const color = value.color || "#eee";
+    const div = document.createElement("div");
+    div.className = "grid-item";
+    div.style.backgroundColor = !img ? color : "";
+    if (img) {
+      const i = document.createElement("img");
+      i.src = img;
+      div.appendChild(i);
+    }
+    const p = document.createElement("p");
+    p.textContent = key;
+    div.appendChild(p);
+    div.onclick = () => onClickFactory(key);
+    grid.appendChild(div);
+  }
+}
+
+// 4. ADD TO CART
+async function promptQuantity(cat, brand, itemName) {
+  const itemSnap = await get(
+    child(
+      ref(db),
+      `products/${cat}/brands/${brand}/items/${itemName}`
+    )
+  );
+  const item = itemSnap.val();
+  const qty = parseInt(
+    prompt(`Qty of ${brand} ${itemName}:`),
+    10
+  );
+  if (!qty || qty <= 0) return;
+  cart.push({
+    cat,
+    brand,
+    itemName,
+    unit: item.unit,
+    price: item.price,
+    qty
+  });
+  const lineTotal = item.price * qty;
+  alert(
+    `Added ${qty} × ${brand} ${itemName}\nSubtotal: ₱${lineTotal}`
+  );
+  renderCartSummary();
+}
+
+// 5. CART & CHECKOUT UI
+function renderCartSummary() {
+  const total = cart.reduce(
+    (sum, x) => sum + x.price * x.qty,
+    0
+  );
+  title.textContent = `Cart Total: ₱${total}`;
+}
+
+// 6. FINALIZE TRANSACTION
+async function checkout() {
+  if (!cart.length) return alert("Cart is empty.");
+  const total = cart.reduce(
+    (sum, x) => sum + x.price * x.qty,
+    0
+  );
+  const paid = parseFloat(
+    prompt(`Total ₱${total}\nAmount paid:`)
+  );
+  if (isNaN(paid) || paid < total)
+    return alert("Insufficient amount.");
+
+  // 6.1 Log sale
+  await push(ref(db, "logs"), {
+    cashier: currentCashier,
+    timestamp: Date.now(),
+    items: cart,
+    total,
+    paid,
+    change: paid - total
+  });
+
+  // 6.2 Decrement inventory
+  cart.forEach(({ cat, brand, itemName, qty }) => {
+    const stockRef = ref(
+      db,
+      `products/${cat}/brands/${brand}/items/${itemName}/stock`
+    );
+    runTransaction(stockRef, (curr) =>
+      curr != null ? curr - qty : curr
+    );
+  });
+
+  alert(`Change: ₱${paid - total}\nThank you!`);
+  cart = [];
+  renderCartSummary();
+  loadCategories();
+}
+
+// 7. ATTACH CHECKOUT BUTTON
+const checkoutBtn = document.createElement("button");
+checkoutBtn.textContent = "Checkout";
+checkoutBtn.onclick = checkout;
+posSection.appendChild(checkoutBtn);
