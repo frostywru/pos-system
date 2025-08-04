@@ -1,45 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sari-Sari Store POS</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>POS System</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <!-- LOGIN SCREEN -->
-  <div id="login-screen">
-    <h2>Enter Cashier PIN</h2>
-    <input type="password" id="pin-input" placeholder="Enter PIN" />
-    <button onclick="handleLogin()">Login</button>
+  <div id="login-screen" style="display: none; height: 100vh; justify-content: center; align-items: center; background: #f2f2f2; flex-direction: column;">
+    <h2 style="margin-bottom: 20px;">Enter Cashier PIN</h2>
+    <input id="pin-input" type="password" placeholder="PIN" style="padding: 10px 15px; font-size: 1.2em; margin-bottom: 10px; width: 200px; text-align: center;" />
+    <button id="login-button" style="padding: 10px 20px; font-size: 1.1em; cursor: pointer;">Login</button>
   </div>
 
   <!-- POS SCREEN -->
-  <div id="pos-screen" style="display: none;">
-    <div id="header">
-      <span id="cashier-name"></span>
-      <button id="change-cashier" onclick="changeCashier()">Change Cashier</button>
+  <div id="pos-screen" style="display: none; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 id="cashier-name">Cashier: </h1>
+      <button onclick="changeCashier()" style="padding: 8px 16px;">Change Cashier</button>
     </div>
 
-    <!-- CATEGORY/BRAND/ITEM DISPLAY -->
     <div id="selection-screen" class="grid-container"></div>
 
-    <!-- QUANTITY INPUT SCREEN -->
-    <div id="quantity-screen" style="display: none;">
+    <div id="quantity-screen" style="display: none; margin-top: 20px;">
       <h2 id="selected-item-name"></h2>
       <input type="number" id="quantity-input" min="1" value="1" />
       <button id="add-to-cart">Add to Cart</button>
     </div>
 
-    <!-- CART DISPLAY -->
-    <div id="cart">
+    <div id="cart" style="margin-top: 20px;">
       <h3>Cart</h3>
     </div>
   </div>
 
-  <!-- Firebase Config -->
-  <script type="module" src="firebase.js"></script>
   <script type="module" src="script.js"></script>
 </body>
 </html>
