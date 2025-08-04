@@ -1,21 +1,20 @@
 import { db, ref, get, child } from './firebase.js';
 
 let cashierList = {};
+let data = {};
 let currentCashier = null;
 let cart = [];
-let data = {};
+let navigationStack = [];
 
 async function loadCashiers() {
   try {
     const snapshot = await get(child(ref(db), 'cashiers'));
     if (snapshot.exists()) {
       cashierList = snapshot.val();
-      console.log("Cashiers loaded:", cashierList);
     } else {
       alert("No cashiers found.");
     }
   } catch (error) {
-    console.error("Error loading cashiers:", error);
     alert("Failed to load cashiers.");
   }
 }
@@ -25,7 +24,7 @@ function handleLogin() {
   const found = Object.values(cashierList).find(c => c.pin === pin);
 
   if (found) {
-    localStorage.setItem("currentCashier", JSON.stringify(found));
+    localStorage.setItem("cashier", JSON.stringify(found));
     showPOS(found);
   } else {
     alert("Invalid PIN");
@@ -41,7 +40,7 @@ function showPOS(cashier) {
 }
 
 function changeCashier() {
-  localStorage.removeItem('currentCashier');
+  localStorage.removeItem('cashier');
   currentCashier = null;
   document.getElementById('pos-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
@@ -55,38 +54,50 @@ async function loadItemData() {
 }
 
 function showCategories() {
+  navigationStack = [];
   const container = document.getElementById("selection-screen");
   container.innerHTML = "";
   for (const [category, brands] of Object.entries(data)) {
     const div = document.createElement("div");
     div.className = "grid-item";
     div.innerHTML = `<img src="images/${category}.png" /><span>${category}</span>`;
-    div.onclick = () => showBrands(category);
+    div.onclick = () => {
+      if (category === "Cigarettes") {
+        navigationStack.push(showCategories);
+        showBrands(category);
+      }
+    };
     container.appendChild(div);
   }
 }
 
 function showBrands(category) {
   const container = document.getElementById("selection-screen");
-  container.innerHTML = "";
+  container.innerHTML = `<button onclick="goBack()">← Back</button>`;
   for (const [brand, items] of Object.entries(data[category])) {
     const div = document.createElement("div");
     div.className = "grid-item";
     div.innerHTML = `<img src="images/${brand}.png" /><span>${brand}</span>`;
-    div.onclick = () => showItems(category, brand);
+    div.onclick = () => {
+      navigationStack.push(() => showBrands(category));
+      showItems(category, brand);
+    };
     container.appendChild(div);
   }
 }
 
 function showItems(category, brand) {
   const container = document.getElementById("selection-screen");
-  container.innerHTML = "";
+  container.innerHTML = `<button onclick="goBack()">← Back</button>`;
   for (const [variant, item] of Object.entries(data[category][brand])) {
     const div = document.createElement("div");
     div.className = "grid-item";
     div.style.backgroundColor = item.color || "#ddd";
     div.innerHTML = `<span>${variant}<br>₱${item.price}</span>`;
-    div.onclick = () => promptQuantity(category, brand, variant, item);
+    div.onclick = () => {
+      navigationStack.push(() => showItems(category, brand));
+      promptQuantity(category, brand, variant, item);
+    };
     container.appendChild(div);
   }
 }
@@ -103,6 +114,7 @@ function promptQuantity(category, brand, variant, item) {
     updateCart();
     document.getElementById("quantity-screen").style.display = "none";
     document.getElementById("selection-screen").style.display = "grid";
+    goBack(); // back to item selection
   };
 }
 
@@ -120,9 +132,16 @@ function updateCart() {
   cartDiv.innerHTML += `<hr><strong>Total: ₱${total}</strong>`;
 }
 
+function goBack() {
+  if (navigationStack.length > 0) {
+    const previous = navigationStack.pop();
+    previous();
+  }
+}
+
 window.onload = async () => {
   await loadCashiers();
-  const saved = localStorage.getItem("currentCashier");
+  const saved = localStorage.getItem("cashier");
   if (saved) {
     showPOS(JSON.parse(saved));
   } else {
@@ -132,3 +151,4 @@ window.onload = async () => {
 
 window.handleLogin = handleLogin;
 window.changeCashier = changeCashier;
+window.goBack = goBack;
