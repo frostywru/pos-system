@@ -1,0 +1,127 @@
+{
+  "Cigarettes": {
+    "image": "images/cigarette.png",
+    "brands": {
+      "Marlboro": {
+        "image": "images/marlboro.png",
+        "items": {
+          "Red": {
+            "price": 10,
+            "unit": "stick",
+            "color": "red"
+          },
+          "Lights": {
+            "price": 10,
+            "unit": "stick",
+            "color": "lightgray"
+          },
+          "Blue": {
+            "price": 10,
+            "unit": "stick",
+            "color": "blue"
+          },
+          "Black": {
+            "price": 10,
+            "unit": "stick",
+            "color": "black"
+          },
+          "Pack": {
+            "price": 190,
+            "unit": "pack",
+            "color": "maroon"
+          }
+        }
+      },
+      "Winston": {
+        "image": "images/winston.png",
+        "items": {
+          "Red": {
+            "price": 9,
+            "unit": "stick",
+            "color": "red"
+          },
+          "Lights": {
+            "price": 9,
+            "unit": "stick",
+            "color": "lightgray"
+          },
+          "Mint Burst": {
+            "price": 180,
+            "unit": "pack",
+            "color": "green"
+          },
+          "Pack": {
+            "price": 180,
+            "unit": "pack",
+            "color": "darkred"
+          }
+        }
+      },
+      "Mighty": {
+        "image": "images/mighty.png",
+        "items": {
+          "Green": {
+            "price": 8,
+            "unit": "stick",
+            "color": "green"
+          },
+          "Red": {
+            "price": 8,
+            "unit": "stick",
+            "color": "red"
+          },
+          "Black": {
+            "price": 8,
+            "unit": "stick",
+            "color": "black"
+          }
+        }
+      },
+      "Fortune": {
+        "image": "images/fortune.png",
+        "items": {
+          "Green": {
+            "price": 8,
+            "unit": "stick",
+            "color": "green"
+          }
+        }
+      },
+      "Chester": {
+        "image": "images/chester.png",
+        "items": {
+          "Red": {
+            "price": 7,
+            "unit": "stick",
+            "color": "red"
+          },
+          "Black": {
+            "price": 7,
+            "unit": "stick",
+            "color": "black"
+          },
+          "Green": {
+            "price": 7,
+            "unit": "stick",
+            "color": "green"
+          }
+        }
+      },
+      "Camel": {
+        "image": "images/camel.png",
+        "items": {
+          "Red": {
+            "price": 7,
+            "unit": "stick",
+            "color": "red"
+          },
+          "Lights": {
+            "price": 7,
+            "unit": "stick",
+            "color": "lightgray"
+          }
+        }
+      }
+    }
+  }
+}

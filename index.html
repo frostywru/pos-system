@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>POS System</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>POS - Cashier</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <div id="category-screen">
-    <h2>Select Category</h2>
-    <div id="categories"></div>
+  <div id="login-screen">
+    <h2>Enter PIN to Login</h2>
+    <input type="number" id="pin-input" maxlength="4" placeholder="Enter PIN" inputmode="numeric" pattern="\d*"/>
+    <button onclick="handleLogin()">Login</button>
   </div>
 
-  <div id="brand-screen" style="display:none;">
-    <h2>Select Brand</h2>
-    <div id="brands"></div>
+  <div id="pos-screen" style="display: none;">
+    <div class="top-bar">
+      <span>Cashier: <strong id="cashier-name"></strong></span>
+      <button class="change-btn" onclick="changeCashier()">Change Cashier</button>
+    </div>
+    <div id="categories-container">
+      <!-- Categories / Brands / Items will appear here -->
+    </div>
   </div>
 
-  <div id="variant-screen" style="display:none;">
-    <h2>Select Variant</h2>
-    <div id="variants"></div>
-  </div>
-
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
