@@ -1,15 +1,14 @@
-import { db } from './firebase.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { db, ref, get, child } from './firebase.js';
 
 let cashierList = {};
 
-// Fetch cashier data from Firestore
 async function loadCashiers() {
-  const querySnapshot = await getDocs(collection(db, "cashiers"));
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    cashierList[data.pin] = { name: data.name, id: data.id };
-  });
+  const snapshot = await get(child(ref(db), 'cashiers'));
+  if (snapshot.exists()) {
+    cashierList = snapshot.val();
+  } else {
+    console.error("No cashiers found in database.");
+  }
 }
 
 function showPOS(cashier) {
@@ -34,12 +33,14 @@ function changeCashier() {
   location.reload();
 }
 
-// On page load
 window.onload = async () => {
-  await loadCashiers(); // fetch data from Firestore
+  await loadCashiers();
   const saved = localStorage.getItem("currentCashier");
   if (saved) {
     const cashier = JSON.parse(saved);
     showPOS(cashier);
   }
 };
+
+window.handleLogin = handleLogin;
+window.changeCashier = changeCashier;
