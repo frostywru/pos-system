@@ -7,10 +7,10 @@
 </head>
 <body>
   <!-- LOGIN SCREEN -->
-  <div id="login-screen" style="display: none; height: 100vh; justify-content: center; align-items: center; background: #f2f2f2; flex-direction: column;">
+  <div id="login-screen" style="display: flex; height: 100vh; justify-content: center; align-items: center; background: #f2f2f2; flex-direction: column;">
     <h2 style="margin-bottom: 20px;">Enter Cashier PIN</h2>
     <input id="pin-input" type="password" placeholder="PIN" style="padding: 10px 15px; font-size: 1.2em; margin-bottom: 10px; width: 200px; text-align: center;" />
-    <button id="login-button" style="padding: 10px 20px; font-size: 1.1em; cursor: pointer;">Login</button>
+    <button onclick="handleLogin()" style="padding: 10px 20px; font-size: 1.1em; cursor: pointer;">Login</button>
   </div>
 
   <!-- POS SCREEN -->

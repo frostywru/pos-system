@@ -1,16 +1,16 @@
 import { db, ref, get, child } from './firebase.js';
 
 let cashierList = {};
-let data = {};
 let currentCashier = null;
 let cart = [];
+let data = {};
 
 async function loadCashiers() {
   try {
     const snapshot = await get(child(ref(db), 'cashiers'));
     if (snapshot.exists()) {
       cashierList = snapshot.val();
-      console.log("Cashiers loaded:", cashierList);  // for debugging
+      console.log("Cashiers loaded:", cashierList);
     } else {
       alert("No cashiers found.");
     }
@@ -20,21 +20,17 @@ async function loadCashiers() {
   }
 }
 
-
 function handleLogin() {
   const pin = document.getElementById("pin-input").value;
   const found = Object.values(cashierList).find(c => c.pin === pin);
 
   if (found) {
-    localStorage.setItem("cashier", JSON.stringify(found));
-    showPOS();
+    localStorage.setItem("currentCashier", JSON.stringify(found));
+    showPOS(found);
   } else {
     alert("Invalid PIN");
-    console.log("Entered PIN:", pin);
-    console.log("Available cashiers:", cashierList);
   }
 }
-
 
 function showPOS(cashier) {
   currentCashier = cashier;
@@ -45,13 +41,12 @@ function showPOS(cashier) {
 }
 
 function changeCashier() {
-  localStorage.removeItem('cashier');
-  cashier = null;
+  localStorage.removeItem('currentCashier');
+  currentCashier = null;
   document.getElementById('pos-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-  loadCashiers(); // 🟢 reload cashiers again
+  loadCashiers();
 }
-
 
 async function loadItemData() {
   const res = await fetch("data.json");
@@ -111,15 +106,6 @@ function promptQuantity(category, brand, variant, item) {
   };
 }
 
-function addToCart() {
-  const qty = parseInt(document.getElementById("quantity-input").value);
-  const item = JSON.parse(document.getElementById("quantity-screen").dataset.item);
-  cart.push({ ...item, qty });
-  updateCart();
-  document.getElementById("quantity-screen").style.display = "none";
-  document.getElementById("selection-screen").style.display = "grid";
-}
-
 function updateCart() {
   const cartDiv = document.getElementById("cart");
   cartDiv.innerHTML = `<h3>Cart</h3>`;
@@ -139,6 +125,8 @@ window.onload = async () => {
   const saved = localStorage.getItem("currentCashier");
   if (saved) {
     showPOS(JSON.parse(saved));
+  } else {
+    document.getElementById("login-screen").style.display = "flex";
   }
 };
 
